@@ -1,0 +1,35 @@
+== mixed rollout: s1 runs tunnel.p4, s2 runs tunnel_v1.p4 ==
+== tcpdump on h2: bytes that reached h2 ==
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on h2-eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+18:04:27.674135 00:00:00:00:00:01 > ff:ff:ff:ff:ff:ff, ethertype Unknown (0x1212), length 53: 
+	0x0000:  ffff ffff ffff 0000 0000 0001 1212 0800  ................
+	0x0010:  0002 0745 0000 2200 0100 0040 0d66 490a  ...E.."....@.fI.
+	0x0020:  3f00 010a 3f00 0310 e110 e100 0e7f 8d6d  ?...?..........m
+	0x0030:  6978 6564 32                             ixed2
+1 packet captured
+1 packet received by filter
+0 packets dropped by kernel
+== s2 (old program) parser log ==
+55:[18:04:27.671] [bmv2] [D] [thread 60749] [0.0] [cxt 0] Extracting header 'ethernet'
+56:[18:04:27.671] [bmv2] [D] [thread 60749] [0.0] [cxt 0] Parser state 'start': key is 1212
+57:[18:04:27.671] [bmv2] [T] [thread 60749] [0.0] [cxt 0] Bytes parsed: 14
+59:[18:04:27.672] [bmv2] [D] [thread 60749] [0.0] [cxt 0] Extracting header 'myTunnel'
+60:[18:04:27.672] [bmv2] [D] [thread 60749] [0.0] [cxt 0] Parser state 'parse_myTunnel': key is 0800
+61:[18:04:27.672] [bmv2] [T] [thread 60749] [0.0] [cxt 0] Bytes parsed: 18
+63:[18:04:27.672] [bmv2] [D] [thread 60749] [0.0] [cxt 0] Extracting header 'ipv4'
+64:[18:04:27.672] [bmv2] [D] [thread 60749] [0.0] [cxt 0] Parser state 'parse_ipv4' has no switch, going to default next state
+65:[18:04:27.672] [bmv2] [T] [thread 60749] [0.0] [cxt 0] Bytes parsed: 38
+69:[18:04:27.672] [bmv2] [T] [thread 60749] [0.0] [cxt 0] Applying table 'MyIngress.myTunnel_exact'
+== s1 (new program) parser log, for comparison ==
+56:[18:04:27.669] [bmv2] [D] [thread 60731] [0.0] [cxt 0] Extracting header 'ethernet'
+57:[18:04:27.669] [bmv2] [D] [thread 60731] [0.0] [cxt 0] Parser state 'start': key is 1212
+58:[18:04:27.669] [bmv2] [T] [thread 60731] [0.0] [cxt 0] Bytes parsed: 14
+60:[18:04:27.669] [bmv2] [D] [thread 60731] [0.0] [cxt 0] Extracting header 'myTunnel'
+61:[18:04:27.669] [bmv2] [D] [thread 60731] [0.0] [cxt 0] Parser state 'parse_myTunnel': key is 0800
+62:[18:04:27.670] [bmv2] [T] [thread 60731] [0.0] [cxt 0] Bytes parsed: 19
+64:[18:04:27.670] [bmv2] [D] [thread 60731] [0.0] [cxt 0] Extracting header 'ipv4'
+65:[18:04:27.670] [bmv2] [D] [thread 60731] [0.0] [cxt 0] Parser state 'parse_ipv4' has no switch, going to default next state
+66:[18:04:27.670] [bmv2] [T] [thread 60731] [0.0] [cxt 0] Bytes parsed: 39
+71:[18:04:27.670] [bmv2] [T] [thread 60731] [0.0] [cxt 0] Applying table 'tbl_tunnel130'
+78:[18:04:27.670] [bmv2] [T] [thread 60731] [0.0] [cxt 0] Applying table 'MyIngress.myTunnel_exact'
